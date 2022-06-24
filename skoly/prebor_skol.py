@@ -21,16 +21,18 @@ else:
     quit()
 
 def printRes(category):
-    fh.write("{}  {:<20} {:>42}\n".format("Pořadí", "Název školy", "Body"))
+    fh.write("{}  {:<20} {:>41} {:>10}\n".format("Pořadí", "Název školy", "Body", "Čas"))
     for i,t in enumerate(category):
-        fh.write(" {:>3}    {:<40} {:<15} {:>4}\n".format(i+1, t[1], teams[t[1]], t[0]))               
+        #fh.write(" {:>3}    {:<40} {:<15} {:>4}\n".format(i+1, t[1], teams[t[1]], t[0]))               
+        fh.write(" {:>3}    {:<40} {:<15} {:>4} {:>11}\n".format(i+1, t[1], teams[t[1]], t[0], t[0])) 
+        #fh.write(" {:>3}    {:<40} {:<15} {:>4}\n".format(i+1, t[1], teams[t[1]], teams[t[2]], t[0]))               
 
 
 # Nacteni vstupnich dat
 i = -1
 headers = []
 data = []
-important = ["Surname", "First name", "Classifier", "City", "Short", "Pl"]
+important = ["Surname", "First name", "Time", "Classifier", "City", "Short", "Pl"]
 with open(fname) as fh:
     for row in reader(fh, delimiter=";"):
         i += 1
@@ -101,6 +103,7 @@ for x in team_num.keys():
    if len(team_num[x]) > team_max:
           team_max = len(team_num[x])
           max_cat = x
+
           
 print("Maximum skol je v kategorii {}: {} skol".format(max_cat, team_max))                            
 print("Maximum skol v kategorii DH3: {} skol".format(team_max_3))
@@ -109,6 +112,8 @@ print("Maximum skol v kategorii DH79: {} skol".format(team_max_79))
 print("Maximum skol v kategorii DHS: {} skol".format(team_max_S))
 
 prev_place = 0
+points_mem = 0
+equ_cnt = 0
 # Vypocet bodu u zavodniku
 data = [x for x in data if x['Classifier'] == '0'] # vyhodit DISK zavodniky, uz nejsou potreba
 for cat in cats:
@@ -124,20 +129,32 @@ for cat in cats:
       points = team_max_S*2
 
     for x in data:
-        if x['Short'] == cat:        
+        if x['Short'] == cat:
+            x['Time']=sum(x * int(t) for x, t in zip([3600, 60, 1], x['Time'].split(":"))) # prepocitat cas na sekundy                                                      
+            if x['Pl'] == prev_place : 
+               equ_cnt += 1 # pocitej zavodniky se stejnym umistenim
+            else :
+               equ_cnt = 0
             if team_score[x['City']] < 2:
-                x['body'] = points
+                if x['Pl'] == prev_place and equ_cnt > 0:
+                   x['Points'] = points_mem
+                else : 
+                   x['Points'] = points
                 team_score[x['City']] += 1
+                points_mem = x['Points']; # uloz body pro prideleni zavodnikum se stejnym umistenim
                 points -= 1
                 #pprint(x)
-                if x['Pl'] == prev_place:                  
-                  x['body'] += 1
-                  team_score[x['City']] += 1                  
-                  #pprint(x)
-                  #pprint(prev_place)                
-            else:
-                x['body'] = 0
+                #pprint(prev_place)                
+            else: 
+               if equ_cnt == 0:               
+                  points_mem = points;  # uloz body pro prideleni zavodnikum se stejnym umistenim
+               x['Points'] = 0            
             prev_place = x['Pl']
+            #pprint(x)
+            #pprint(prev_place)
+            #pprint(points_mem)
+            #pprint(points)
+            #pprint(equ_cnt)
 #pprint(data)
 
 # Vypocet bodu u druzstev
@@ -150,40 +167,40 @@ hds = {}
 for x in data:
     if x['Short'] == "D3" or x['Short'] == "H3":
         if x['City'] in hd3.keys():
-            hd3[x['City']] += x['body']
+            hd3[x['City']] += x['Points']
         else:
-            hd3[x['City']] = x['body']
+            hd3[x['City']] = x['Points']
     elif x['Short'] == "D5" or x['Short'] == "H5":
         if x['City'] in hd5.keys():
-            hd5[x['City']] += x['body']
+            hd5[x['City']] += x['Points']
         else:
-            hd5[x['City']] = x['body']    
+            hd5[x['City']] = x['Points']    
             
     elif x['Short'] == "D7" or x['Short'] == "H7":
         if x['City'] in hd7.keys():
-            hd7[x['City']] += x['body']
+            hd7[x['City']] += x['Points']
         else:
-            hd7[x['City']] = x['body']
+            hd7[x['City']] = x['Points']
             
     elif x['Short'] == "D9" or x['Short'] == "H9":
         if x['City'] in hd9.keys():
-            hd9[x['City']] += x['body']
+            hd9[x['City']] += x['Points']
         else:
-            hd9[x['City']] = x['body']            
+            hd9[x['City']] = x['Points']            
                         
     elif x['Short'] == "DS" or x['Short'] == "HS":
         if x['City'] in hds.keys():
-            hds[x['City']] += x['body']
+            hds[x['City']] += x['Points']
         else:
-            hds[x['City']] = x['body']
+            hds[x['City']] = x['Points']
     #else:
         #print("Neznámá kategorie {} u závodníka/ice {} {}".format(x['Short'], x['First name'], x['Surname']))
 
     if x['Short'] == "D7" or x['Short'] == "H7" or x['Short'] == "D9" or x['Short'] == "H9":
         if x['City'] in hd79.keys():
-            hd79[x['City']] += x['body']
+            hd79[x['City']] += x['Points']
         else:
-            hd79[x['City']] = x['body']
+            hd79[x['City']] = x['Points']
         
 #pprint(hd3)
 #pprint(hd5)
@@ -230,7 +247,7 @@ print("\nVysledky preboru ulozeny do souboru \"vysledky_skoly.txt\"")
 
 
 with open("vysledky_body.csv", 'w', encoding="utf-8") as fhb:
-    fhb.write("Kategorie;Jméno;Škola;Pořadí;Body\n".format(x['Short'],x['Surname'], x['First name'], x['City'],x['body']))
+    fhb.write("Kategorie;Jméno;Škola;Pořadí;Body;Čas\n".format(x['Short'],x['Surname'], x['First name'], x['City'],x['Points'],x['Time']))
     for x in data:
-       #if (x['body'] > 0):                           
-         fhb.write("{}; {} {};{};{};{}\n".format(x['Short'],x['Surname'], x['First name'], x['City'],x['Pl'],x['body']))
+       #if (x['Points'] > 0):                           
+         fhb.write("{}; {} {};{};{};{};{}\n".format(x['Short'],x['Surname'], x['First name'], x['City'],x['Pl'],x['Points'], x['Time']))
