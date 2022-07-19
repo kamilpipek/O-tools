@@ -20,12 +20,15 @@ else:
     print(usage)
     quit()
 
-def printRes(category):
+def printRes(category,time):
     fh.write("{}  {:<20} {:>41} {:>10}\n".format("Pořadí", "Název školy", "Body", "Čas"))
+    #pprint(category)
+    #pprint(time)
     for i,t in enumerate(category):
-        #fh.write(" {:>3}    {:<40} {:<15} {:>4}\n".format(i+1, t[1], teams[t[1]], t[0]))               
-        fh.write(" {:>3}    {:<40} {:<15} {:>4} {:>11}\n".format(i+1, t[1], teams[t[1]], t[0], t[0])) 
-        #fh.write(" {:>3}    {:<40} {:<15} {:>4}\n".format(i+1, t[1], teams[t[1]], teams[t[2]], t[0]))               
+        fh.write(" {:>3}    {:<40} {:<15} {:>4}".format(i+1, t[1], teams[t[1]], t[0]))                       
+        for j,u in enumerate(time):
+            if t[1] == u[1] :
+              fh.write("   {:>10}\n".format(u[0]))        
 
 
 # Nacteni vstupnich dat
@@ -158,69 +161,113 @@ for cat in cats:
 #pprint(data)
 
 # Vypocet bodu u druzstev
-hd3 = {}
-hd5 = {}
-hd79 = {}
-hd7 = {}
-hd9 = {}
-hds = {}
+hd3_points = {}
+hd3_time = {}
+hd5_points = {}
+hd5_time = {}
+hd79_points = {}
+hd79_time = {}
+hd7_points = {}
+hd7_time = {}
+hd9_points = {}
+hd9_time = {}
+hds_points = {}
+hds_time = {}
 for x in data:
     if x['Short'] == "D3" or x['Short'] == "H3":
-        if x['City'] in hd3.keys():
-            hd3[x['City']] += x['Points']
+        if x['City'] in hd3_points.keys():
+            hd3_points[x['City']] += x['Points']
+            if (x['Points']) :
+                hd3_time[x['City']] += x['Time']
         else:
-            hd3[x['City']] = x['Points']
+            hd3_points[x['City']] = x['Points']
+            if (x['Points']) :
+                hd3_time[x['City']] = x['Time']
+
     elif x['Short'] == "D5" or x['Short'] == "H5":
-        if x['City'] in hd5.keys():
-            hd5[x['City']] += x['Points']
+        if x['City'] in hd5_points.keys():
+            hd5_points[x['City']] += x['Points']
+            if (x['Points']) :
+                hd5_time[x['City']] += x['Time']
         else:
-            hd5[x['City']] = x['Points']    
+            hd5_points[x['City']] = x['Points']    
+            if (x['Points']) :
+                hd5_time[x['City']] = x['Time']
             
     elif x['Short'] == "D7" or x['Short'] == "H7":
-        if x['City'] in hd7.keys():
-            hd7[x['City']] += x['Points']
+        if x['City'] in hd7_points.keys():
+            hd7_points[x['City']] += x['Points']
+            if (x['Points']) :
+                hd7_time[x['City']] += x['Time']
         else:
-            hd7[x['City']] = x['Points']
+            hd7_points[x['City']] = x['Points']
+            if (x['Points']) :
+                hd7_time[x['City']] = x['Points']
             
     elif x['Short'] == "D9" or x['Short'] == "H9":
-        if x['City'] in hd9.keys():
-            hd9[x['City']] += x['Points']
+        if x['City'] in hd9_points.keys():
+            hd9_points[x['City']] += x['Points']
+            if (x['Points']) :
+                hd9_time[x['City']] += x['Time']
         else:
-            hd9[x['City']] = x['Points']            
+            hd9_points[x['City']] = x['Points']            
+            if (x['Points']) :
+                hd9_time[x['City']] = x['Time']
                         
     elif x['Short'] == "DS" or x['Short'] == "HS":
-        if x['City'] in hds.keys():
-            hds[x['City']] += x['Points']
+        if x['City'] in hds_points.keys():
+            hds_points[x['City']] += x['Points']
+            if (x['Points']) :
+                hds_time[x['City']] += x['Time']
         else:
-            hds[x['City']] = x['Points']
+            hds_points[x['City']] = x['Points']
+            if (x['Points']) :
+                hds_time[x['City']] = x['Time']
     #else:
         #print("Neznámá kategorie {} u závodníka/ice {} {}".format(x['Short'], x['First name'], x['Surname']))
 
     if x['Short'] == "D7" or x['Short'] == "H7" or x['Short'] == "D9" or x['Short'] == "H9":
-        if x['City'] in hd79.keys():
-            hd79[x['City']] += x['Points']
+        if x['City'] in hd79_points.keys():
+            hd79_points[x['City']] += x['Points']
+            if (x['Points']) :
+                hd79_time[x['City']] += x['Time']
         else:
-            hd79[x['City']] = x['Points']
+            hd79_points[x['City']] = x['Points']
+            if (x['Points']) :
+                hd79_time[x['City']] = x['Time']
+
         
-#pprint(hd3)
-#pprint(hd5)
-#pprint(hd7)
-#pprint(hd9)
-#pprint(hd79)
-#pprint(hds)
+#pprint(hd3_points)
+#pprint(hd3_time)
+#pprint(hd5_points)
+#pprint(hd5_time)
+#pprint(hd7_points)
+#pprint(hd7_time)
+#pprint(hd9_points)
+#pprint(hd9_time)
+#pprint(hd79_points)
+#pprint(hd79_time)
+#pprint(hds_points)
+#pprint(hds_time)
 
 # Serazeni skol podle bodu
-hd3i = sorted([(hd3[x], x) for x in hd3], reverse = True)
+hd3i = sorted([(hd3_points[x], x) for x in hd3_points], reverse = True)
+hd3i_time = sorted([(hd3_time[x], x) for x in hd3_time], reverse = True)
 #pprint(hd3i)
-hd5i = sorted([(hd5[x], x) for x in hd5], reverse = True)
+hd5i = sorted([(hd5_points[x], x) for x in hd5_points], reverse = True)
+hd5i_time = sorted([(hd5_time[x], x) for x in hd5_time], reverse = True)
 #pprint(hd5i)
-hd79i = sorted([(hd79[x], x) for x in hd79], reverse = True)
+hd79i = sorted([(hd79_points[x], x) for x in hd79_points], reverse = True)
+hd79i_time = sorted([(hd79_time[x], x) for x in hd79_time], reverse = True)
 #pprint(hd79i)
-hd7i = sorted([(hd7[x], x) for x in hd7], reverse = True)
+hd7i = sorted([(hd7_points[x], x) for x in hd7_points], reverse = True)
+hd7i_time = sorted([(hd7_time[x], x) for x in hd7_time], reverse = True)
 #pprint(hd7i)
-hd9i = sorted([(hd9[x], x) for x in hd9], reverse = True)
+hd9i = sorted([(hd9_points[x], x) for x in hd9_points], reverse = True)
+hd9i_time = sorted([(hd9_time[x], x) for x in hd9_time], reverse = True)
 #pprint(hd9i)
-hdsi = sorted([(hds[x], x) for x in hds], reverse = True)
+hdsi = sorted([(hds_points[x], x) for x in hds_points], reverse = True)
+hdsi_time = sorted([(hds_time[x], x) for x in hds_time], reverse = True)
 #pprint(hdsi)
 
 # Vypis vysledku do souboru
@@ -232,17 +279,17 @@ with open("vysledky_skoly.txt", 'w', encoding="utf-8") as fh:
     fh.write("Maximum bodů v kategorii DH79: {}\n".format(team_max_79*2))
     fh.write("Maximum bodů v kategorii DHS: {}\n".format(team_max_S*2))
     fh.write("\n==== D3 + H3 ====\n")
-    printRes(hd3i)
+    printRes(hd3i,hd3i_time)    
     fh.write("\n==== D5 + H5 ====\n")
-    printRes(hd5i)
+    printRes(hd5i,hd5i_time)
     fh.write("\n==== D7 + H7 ====\n")
-    printRes(hd7i)
+    printRes(hd7i,hd7i_time)
     fh.write("\n==== D9 + H9 ====\n")
-    printRes(hd9i)    
+    printRes(hd9i,hd9i_time)    
     fh.write("\n==== D7 + H7 + D9 + H9 ====\n")
-    printRes(hd79i)
+    printRes(hd79i,hd79i_time)
     fh.write("\n==== DS + HS ====\n")
-    printRes(hdsi)
+    printRes(hdsi,hdsi_time)
 print("\nVysledky preboru ulozeny do souboru \"vysledky_skoly.txt\"")
 
 
